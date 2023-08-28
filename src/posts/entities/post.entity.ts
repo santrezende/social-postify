@@ -6,7 +6,7 @@ export class Post {
   constructor(title: string, text: string, image?: string) {
     this._title = title;
     this._text = text;
-    this._image = image || '';
+    this._image = image || null;
   }
 
   get title() {

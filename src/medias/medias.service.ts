@@ -1,23 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
+import { MediasRepository } from './medias.repository';
 
 @Injectable()
 export class MediasService {
+  private readonly mediasRepository: MediasRepository;
+
+  constructor(mediasRepository: MediasRepository) {
+    this.mediasRepository = mediasRepository;
+  }
   create(createMediaDto: CreateMediaDto) {
-    return 'This action adds a new media';
+    const existingMedia = this.mediasRepository.findByInput(createMediaDto);
+
+    if (existingMedia) throw new ConflictException();
+
+    return this.mediasRepository.create(createMediaDto);
   }
 
   findAll() {
-    return `This action returns all medias`;
+    return this.mediasRepository.findAll();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} media`;
+    const idMedia = this.mediasRepository.findById(id);
+
+    if (!idMedia) throw new NotFoundException();
+
+    return idMedia;
   }
 
   update(id: number, updateMediaDto: UpdateMediaDto) {
-    return `This action updates a #${id} media`;
+    const existingMedia = this.mediasRepository.findByInput(updateMediaDto);
+    if (existingMedia) throw new ConflictException();
+
+    const updateMedia = this.mediasRepository.findById(id);
+    if (!updateMedia) throw new NotFoundException();
+
+    return this.mediasRepository.update(id, updateMediaDto);
   }
 
   remove(id: number) {

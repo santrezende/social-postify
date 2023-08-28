@@ -1,23 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PostsRepository } from './posts.repository';
 
 @Injectable()
 export class PostsService {
+  private readonly postsRepository: PostsRepository;
+
+  constructor(postsRepository: PostsRepository) {
+    this.postsRepository = postsRepository;
+  }
   create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+    return this.postsRepository.create(createPostDto);
   }
 
   findAll() {
-    return `This action returns all posts`;
+    return this.postsRepository.findAll();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} post`;
+    return this.postsRepository.findById(id);
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+    const updatePost = this.postsRepository.findById(id);
+    if (!updatePost) throw new NotFoundException();
+    return this.postsRepository.update(id, updatePostDto);
   }
 
   remove(id: number) {
