@@ -19,7 +19,10 @@ export class PostsService {
   }
 
   findOne(id: number) {
-    return this.postsRepository.findById(id);
+    const idPost = this.postsRepository.findById(id);
+    if (!idPost) throw new NotFoundException();
+
+    return idPost;
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {

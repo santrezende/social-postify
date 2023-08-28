@@ -28,7 +28,6 @@ export class MediasService {
 
   findOne(id: number) {
     const idMedia = this.mediasRepository.findById(id);
-
     if (!idMedia) throw new NotFoundException();
 
     return idMedia;

@@ -8,5 +8,6 @@ import { PrismaModule } from 'src/prisma/prisma.module';
   imports: [PrismaModule],
   controllers: [PostsController],
   providers: [PostsService, PostsRepository],
+  exports: [PostsModule],
 })
 export class PostsModule {}

@@ -1,12 +1,12 @@
 export class Publication {
   private _mediaId: string;
   private _postId: string;
-  private _date: Date;
+  private _date: string;
 
-  constructor(title: string, username: string) {
+  constructor(title: string, username: string, date: string) {
     this._mediaId = title;
     this._postId = username;
-    this._date = new Date();
+    this._date = date;
   }
 
   get mediaId() {

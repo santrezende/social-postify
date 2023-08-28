@@ -8,5 +8,6 @@ import { PrismaModule } from 'src/prisma/prisma.module';
   imports: [PrismaModule],
   controllers: [MediasController],
   providers: [MediasService, MediasRepository],
+  exports: [MediasModule],
 })
 export class MediasModule {}
