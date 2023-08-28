@@ -4,9 +4,9 @@ import * as request from 'supertest';
 import { faker } from '@faker-js/faker';
 import { AppModule } from 'src/app.module';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { createMedia } from './factories/medias-factory';
-import { createPublication } from './factories/publications-factory';
-import { cleanDb } from './clean-db';
+import { createMedia } from '../factories/medias-factory';
+import { createPublication } from '../factories/publications-factory';
+import { cleanDb } from '../clean-db';
 
 describe('Medias', () => {
   let app: INestApplication;
