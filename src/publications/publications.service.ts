@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { MediasRepository } from 'src/medias/medias.repository';
 import { PostsRepository } from 'src/posts/posts.repository';
 import { CreatePublicationDto } from './dto/create-publication.dto';
@@ -20,11 +24,11 @@ export class PublicationsService {
     this.mediasRepository = mediasRepository;
     this.postsRepository = postsRepository;
   }
-  create(createPublicationDto: CreatePublicationDto) {
-    const validateMedia = this.mediasRepository.findById(
+  async create(createPublicationDto: CreatePublicationDto) {
+    const validateMedia = await this.mediasRepository.findById(
       createPublicationDto.mediaId,
     );
-    const validatePost = this.postsRepository.findById(
+    const validatePost = await this.postsRepository.findById(
       createPublicationDto.postId,
     );
 
@@ -37,28 +41,39 @@ export class PublicationsService {
     return this.publicationsRepository.findAll();
   }
 
-  findOne(id: number) {
-    const idPublication = this.publicationsRepository.findById(id);
+  async findOne(id: number) {
+    const idPublication = await this.publicationsRepository.findById(id);
     if (!idPublication) throw new NotFoundException();
 
     return idPublication;
   }
 
-  update(id: number, updatePublicationDto: UpdatePublicationDto) {
-    const validateMedia = this.mediasRepository.findById(
+  async isPublished(id: number) {
+    const result = await this.publicationsRepository.findById(id);
+    if (result.date < new Date()) {
+      throw new ForbiddenException();
+    }
+  }
+
+  async update(id: number, updatePublicationDto: UpdatePublicationDto) {
+    const validateMedia = await this.mediasRepository.findById(
       updatePublicationDto.mediaId,
     );
-    const validatePost = this.postsRepository.findById(
+    const validatePost = await this.postsRepository.findById(
       updatePublicationDto.postId,
     );
-    const validatePublication = this.publicationsRepository.findById(id);
+    const validatePublication = await this.publicationsRepository.findById(id);
 
     if (!validateMedia || !validatePost || !validatePublication)
       throw new NotFoundException();
+
+    if (validatePublication.date < new Date()) throw new ForbiddenException();
+
+    return this.publicationsRepository.update(id, updatePublicationDto);
   }
 
-  remove(id: number) {
-    const idPublication = this.publicationsRepository.findById(id);
+  async remove(id: number) {
+    const idPublication = await this.publicationsRepository.findById(id);
     if (!idPublication) throw new NotFoundException();
 
     return this.publicationsRepository.remove(id);

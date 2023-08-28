@@ -46,4 +46,21 @@ export class MediasRepository {
       },
     });
   }
+
+  delete(id: number) {
+    return this.prisma.media.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  findIdInPublications(id: number) {
+    return this.prisma.media.findFirst({
+      where: { id },
+      include: {
+        Publication: true,
+      },
+    });
+  }
 }

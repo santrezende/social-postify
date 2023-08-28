@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,8 +15,9 @@ export class MediasService {
   constructor(mediasRepository: MediasRepository) {
     this.mediasRepository = mediasRepository;
   }
-  create(createMediaDto: CreateMediaDto) {
-    const existingMedia = this.mediasRepository.findByInput(createMediaDto);
+  async create(createMediaDto: CreateMediaDto) {
+    const existingMedia =
+      await this.mediasRepository.findByInput(createMediaDto);
 
     if (existingMedia) throw new ConflictException();
 
@@ -26,24 +28,29 @@ export class MediasService {
     return this.mediasRepository.findAll();
   }
 
-  findOne(id: number) {
-    const idMedia = this.mediasRepository.findById(id);
+  async findOne(id: number) {
+    const idMedia = await this.mediasRepository.findById(id);
     if (!idMedia) throw new NotFoundException();
 
     return idMedia;
   }
 
-  update(id: number, updateMediaDto: UpdateMediaDto) {
-    const existingMedia = this.mediasRepository.findByInput(updateMediaDto);
+  async update(id: number, updateMediaDto: UpdateMediaDto) {
+    const existingMedia =
+      await this.mediasRepository.findByInput(updateMediaDto);
     if (existingMedia) throw new ConflictException();
 
-    const updateMedia = this.mediasRepository.findById(id);
+    const updateMedia = await this.mediasRepository.findById(id);
     if (!updateMedia) throw new NotFoundException();
 
     return this.mediasRepository.update(id, updateMediaDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} media`;
+  async remove(id: number) {
+    await this.findOne(id);
+    const result = await this.mediasRepository.findIdInPublications(id);
+
+    if (result.Publication.length !== 0) throw new ForbiddenException();
+    return this.mediasRepository.delete(id);
   }
 }

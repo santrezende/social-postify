@@ -38,4 +38,21 @@ export class PostsRepository {
       },
     });
   }
+
+  delete(id: number) {
+    return this.prisma.post.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  findIdInPublications(id: number) {
+    return this.prisma.post.findFirst({
+      where: { id },
+      include: {
+        Publication: true,
+      },
+    });
+  }
 }
