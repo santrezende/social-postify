@@ -18,6 +18,51 @@ export class PublicationsRepository {
     return this.prisma.publication.findMany();
   }
 
+  findAllPublished(published: boolean) {
+    const today = new Date;
+    const filter = published ? { lt: today } : { gt: today };
+    return this.prisma.publication.findMany({
+      where: {
+        date: filter
+      }
+    })
+  }
+
+  findAllAfter(after: Date) {
+    return this.prisma.publication.findMany({
+      where: {
+        date: {
+          gt: after
+        }
+      }
+    })
+  }
+
+  filter(published: boolean, after: Date) {
+    const today = new Date();
+
+    if (published) {
+      if (after > today) return [];
+      return this.prisma.publication.findMany({ // from date to today
+        where: {
+          AND: [
+            { date: { gt: after } },
+            { date: { lt: today } }
+          ]
+        }
+      })
+    }
+
+    const refDate = after > today ? after : today;
+    return this.prisma.publication.findMany({
+      where: {
+        date: {
+          gt: refDate
+        }
+      }
+    })
+  }
+
   findById(id: number) {
     return this.prisma.publication.findFirst({
       where: {

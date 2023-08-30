@@ -1,5 +1,7 @@
 import {
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -35,6 +37,27 @@ export class PublicationsService {
     if (!validateMedia || !validatePost) throw new NotFoundException();
 
     return this.publicationsRepository.create(createPublicationDto);
+  }
+
+  isPastDate(date: Date) {
+    const current = new Date();
+    if (date < current) throw new HttpException("Cannot schedule in the past", HttpStatus.FORBIDDEN);
+  }
+
+  async isValidPublication(dto: CreatePublicationDto | UpdatePublicationDto) {
+    const { mediaId, postId, date } = dto;
+
+    if (mediaId) await this.mediasRepository.findById(mediaId);
+    if (postId) await this.postsRepository.findById(postId);
+    if (date) this.isPastDate(new Date(date))
+  }
+
+  async findAllAfter(after: Date) {
+    return await this.publicationsRepository.findAllAfter(after);
+  }
+
+  async filter(published: boolean, after: Date) {
+    return await this.publicationsRepository.filter(published, after);
   }
 
   findAll() {
